@@ -7,6 +7,7 @@ export interface FAQ {
 }
 
 export interface CreateFAQPayload {
+  // id:number;
   question: string;
   answer: string;
 }
@@ -22,6 +23,10 @@ export const faqService = {
     return response.data.data;
   },
 
+  updateFaq:async (id: number | string, data: Partial<CreateFAQPayload>): Promise<FAQ> => {
+    const response = await apiClient.put<FAQ>(`/edit-faq/${id}`, data);
+    return response.data;
+  },
   deleteFaq: async (id: number | string): Promise<void> => {
     await apiClient.delete(`/delete-faq/${id}`);
   },

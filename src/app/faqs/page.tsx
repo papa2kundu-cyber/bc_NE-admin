@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { faqService } from "@/services";
+import { CreateFAQPayload, faqService } from "@/services";
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
 import AdminTable, { Column } from "@/components/admin/AdminTable";
 import AdminModal from "@/components/admin/AdminModal";
@@ -18,12 +18,12 @@ export default function FAQsPage() {
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [deleteId, setDeleteId] = useState<number | null>(null);
-
   const { data: faqs = [], isLoading } = useQuery({
     queryKey: ["faqs"],
     queryFn: faqService.getAllFaqs,
   });
-
+  // console.log(first)
+ 
   const addMutation = useMutation({
     mutationFn: faqService.createFaq,
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["faqs"] }); closeModal(); },
@@ -34,6 +34,14 @@ export default function FAQsPage() {
     mutationFn: (id: number) => faqService.deleteFaq(id),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["faqs"] }); setDeleteId(null); },
   });
+  const updateMutation = useMutation({
+  mutationFn: ({ id, data }: { id: number; data: CreateFAQPayload }) =>
+    faqService.updateFaq(id, data),
+  onSuccess: () => {
+    qc.invalidateQueries({ queryKey: ["faqs"] });
+    closeModal();
+  },
+});
 
   const closeModal = () => { setModalOpen(false); setEditId(null); setForm(emptyForm); };
   const openAdd = () => { setEditId(null); setForm(emptyForm); setModalOpen(true); };
@@ -47,7 +55,11 @@ export default function FAQsPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Re-create (the API only exposes create-faq; for edit, re-post with same data)
-    addMutation.mutate({ question: form.question, answer: form.answer });
+    if (editId !== null) {
+      updateMutation.mutate({ id: editId, data: { question: form.question, answer: form.answer } });
+    } else {
+      addMutation.mutate({ question: form.question, answer: form.answer });
+    }
   };
 
   const columns: Column<FAQRow>[] = [

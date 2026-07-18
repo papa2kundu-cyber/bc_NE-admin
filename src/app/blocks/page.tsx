@@ -9,6 +9,7 @@ import AdminModal from "@/components/admin/AdminModal";
 import { FormField, Input, Textarea, Select, FormActions } from "@/components/admin/FormField";
 import { FileText, Loader2, ChevronDown, Globe } from "lucide-react";
 import { SeoSettings, getBlogSeo, setBlogSeo } from "@/lib/seoStore";
+import RichTextEditor from "@/components/RichTextEditor";
 
 const CATEGORIES = [
   { value: "Design Trends", label: "Design Trends" },
@@ -274,13 +275,26 @@ export default function BlocksPage() {
           </FormField>
 
           <FormField label="Description" required>
-            <Textarea
-              rows={5}
+            {/* <Editor
               value={form.description}
-              onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-              placeholder="Write the block content here..."
-              required
+              onChange={(value) =>
+                setForm((f) => ({
+                  ...f,
+                  description: value,
+                }))
+              }
+            /> */}
+            
+            <RichTextEditor
+              value={form.description}
+              onChange={(value) =>
+                setForm((f) => ({
+                  ...f,
+                  description: value,
+                }))
+              }
             />
+
           </FormField>
 
           <FormField label="Cover Image" hint="Upload a cover image (JPG, PNG, WebP).">
